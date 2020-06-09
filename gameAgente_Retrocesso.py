@@ -22,31 +22,26 @@ class GameAgenteRetrocesso:
         matriz =[]
         local = input("Escreva o caminho do txt -->  ")
         arq = open(local)
-        #matriz = []
+        
         for line in arq.readlines():
             lista = []
             for i in range(len(line)):
                 lista.append(line[i])
             arq.close
             matriz.append(lista)
-            #self.listaValoresIniciais.append(lista)
 
         self.addImutaveis(matriz)
         self.desenhaQuadrado(matriz)
         if self.backtracking(0,0,matriz):
-            #print(str(matriz))
             self.desenhaQuadrado(matriz)
         else:
             print('Não foi possível encontrar a solução! :(')
-        #self.regras(matriz)
 
     def backtracking(self, i, j,vetor):
         import random
         
         if (i == 8) and (j == 8):
             return True
-        #elif (vetor[i] != 0):
-        #    return self.backtracking(i+1, j+1, vetor)
         
         for linha in range(0,9):
             for coluna in range(0,9):
@@ -85,7 +80,6 @@ class GameAgenteRetrocesso:
     def verificaConflitoLinha(self, matrizVerifica):
         for i in range(len(matrizVerifica)):
             for j in range(i+1, len(matrizVerifica)):
-                #print('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz '+str(j))
                 if matrizVerifica[i] == matrizVerifica[j]:
                     return True
 
@@ -147,7 +141,7 @@ class GameAgenteRetrocesso:
                 self.posicaoConflito.append(posicaoColorirQuadAux[auxiliar])
                 self.posicaoConflito.append(str(int(linha)-1)+str(int(coluna)-1))
 
-            #print("Existe conflitos no quadrante!")
+            
             return True
 
         else:
@@ -157,11 +151,7 @@ class GameAgenteRetrocesso:
     #PARTE DA BUSCA
     def acoes(self, estadoInicial):
         from random import randint
-        
-        #print('matriz que o ações ta recebendo -> '+str(matriz))
         estadoGerado = []
-        #while True:
-
         for linha in range(len(estadoInicial)):
             for coluna in range(len(estadoInicial[linha])):
                 if estadoInicial[linha][coluna] == ' ':
@@ -169,29 +159,6 @@ class GameAgenteRetrocesso:
                     estadoGerado.append(str(randint(1, 9)))
 
         return estadoGerado
-
-
-    def subidaEncosta(self, estadoVerificacao):
-        soma = 0
-        linha = 0
-        coluna = 0
-        #print('MATRIX '+str(estadoVerificacao))
-        for linha in range(len(estadoVerificacao)):
-            soma=soma+self.verificaConflitoLinha(estadoVerificacao[linha])
-            #print('LINHA = '+str(linha)+' , VALOR '+str(soma))
-
-        for coluna in range(0,9):
-            soma = soma+self.verificaConflitoColuna(estadoVerificacao, coluna)
-                
-
-        for i in range(0,9):
-            if i in [2,5,8]:
-                if self.verificaQuadrante(estadoVerificacao, i, i):
-                    soma = soma+1
-        
-        #print('soma massa '+str(soma))
-        return soma
-
 
     def desenhaQuadrado(self, matrizDesenho):
         numeracao = ""

@@ -25,30 +25,23 @@ class GameAgente:
         matriz =[]
         local = input("Escreva o caminho do txt -->  ")
         arq = open(local)
-        #matriz = []
         for line in arq.readlines():
             lista = []
             for i in range(len(line)):
                 lista.append(line[i])
             arq.close
             matriz.append(lista)
-            #self.listaValoresIniciais.append(lista)
 
         self.addImutaveis(matriz)
         self.desenhaQuadrado(matriz)
         self.subidaEncosta(tuple(matriz))
-
 
     def verificaArray(self, a):
         if a in self.posicaoConflito:
             return True
         return False
 
-
     def addImutaveis(self, matrizInicial):
-        linha = 0
-        
-
         linha = 0
         for linha in range(len(matrizInicial)):
             coluna = 0
@@ -61,74 +54,48 @@ class GameAgente:
         auxCont = 0
         verificacaoMelhorEstado = -1
         bAux = False
-        #print('tamanho '+str(len(matrizInicial)))
-        #print('tamanho '+str(len(matrizResultado)))
         while auxCont < self.qtdeReinicio:
-            
             melhorEstado = []
             acoesRetornadas = []
             matrizResultado = []
-            
             auxFuncaoAvaliacao = 0
             auxAcoesRetornadas = 0
-            #print('loco '+str(matrizResultado))
             for i in range(len(matrizInicial)):
                 aux = []
                 for j in range(len(matrizInicial[i])):
                     aux.append(matrizInicial[i][j])
-                    #print('aux '+str(aux))
                 matrizResultado.append(aux)
-            
-            
-            #print('massa '+str(matrizResultado))
 
             acoesRetornadas = self.acoes(matrizInicial)
             
             for linha in range(len(matrizResultado)):
                 for coluna in range(len(matrizResultado[linha])):
                     if matrizResultado[linha][coluna] == ' ':
-                        #print('antes -> '+str(matrizResultado[linha][coluna]))
                         matrizResultado[linha][coluna] = acoesRetornadas[auxAcoesRetornadas]
-                        #print('depois -> '+str(matrizResultado[linha][coluna]))
                         auxAcoesRetornadas = auxAcoesRetornadas+1
             auxFuncaoAvaliacao = self.funcaoAvaliacao(tuple(matrizResultado))
-            #print('matriz resultado '+str(matrizResultado))
-            #print('valor legal '+str(auxFuncaoAvaliacao))
-            #print('auzFunção '+str(auxFuncaoAvaliacao)+'   melhor estado '+str(verificacaoMelhorEstado))
+            
             if ((verificacaoMelhorEstado == -1) or (auxFuncaoAvaliacao < verificacaoMelhorEstado)):
                 verificacaoMelhorEstado = auxFuncaoAvaliacao
                 melhorEstado = matrizResultado
-                print('melhor '+str(verificacaoMelhorEstado))
                 
-            
                 if verificacaoMelhorEstado == 0:
                     self.desenhaQuadrado(melhorEstado)
                     print('Fim do jogo.')
                     bAux = True
                     break
-            
-                    #return melhorEstado
-            #matrizResultado.remove
             auxCont = auxCont + 1
         if not bAux:
             print('Não foi encontrada a solução!')
-
-
 
     def verificaConflitoLinha(self, matrizVerifica):
         retorno = 0
         for i in range(len(matrizVerifica)):
             for j in range(i+1, len(matrizVerifica)):
-                #print('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz '+str(j))
                 if matrizVerifica[i] == matrizVerifica[j]:
                     retorno=retorno+1
 
         return retorno
-
-            
-            
-            
-
 
     def verificaConflitoColuna(self, matrizVerifica, coluna):
         resultado = 0
@@ -138,9 +105,6 @@ class GameAgente:
                     #TEM CONFLITO NA COLUNA
                     resultado=resultado+1
         return resultado
-                    
-                    
-
 
     def verificaQuadrante(self, matrizVerifica, coluna, linha):
         
@@ -149,6 +113,7 @@ class GameAgente:
         posicaoColorirQuadAux = []
         quadrante = []
         conflitoQuad = False
+        soma=False
         i = 0
         j = 0
         if int(coluna) in [1, 2, 3]:
@@ -181,6 +146,7 @@ class GameAgente:
         for i in range(0, len(quadrante)):
             for j in range(0, len(quadrante)):
                 if quadrante[i] == quadrante[j]:
+                    soma=soma+1
                     conflitoQuad = True
                     auxiliar = i
                     break
@@ -189,22 +155,17 @@ class GameAgente:
             if not self.verificaArray(posicaoColorirQuadAux[auxiliar]):
                 self.posicaoConflito.append(posicaoColorirQuadAux[auxiliar])
                 self.posicaoConflito.append(str(int(linha)-1)+str(int(coluna)-1))
-
-            #print("Existe conflitos no quadrante!")
-            return True
+            return soma
 
         else:
-            return False
+            return soma
 
 
     #PARTE DA BUSCA
     def acoes(self, estadoInicial):
         from random import randint
-        
-        #print('matriz que o ações ta recebendo -> '+str(matriz))
         estadoGerado = []
-        #while True:
-
+        
         for linha in range(len(estadoInicial)):
             for coluna in range(len(estadoInicial[linha])):
                 if estadoInicial[linha][coluna] == ' ':
@@ -229,23 +190,17 @@ class GameAgente:
         soma = 0
         linha = 0
         coluna = 0
-        #print('MATRIX '+str(estadoVerificacao))
         for linha in range(len(estadoVerificacao)):
             soma=soma+self.verificaConflitoLinha(estadoVerificacao[linha])
-            #print('LINHA = '+str(linha)+' , VALOR '+str(soma))
 
         for coluna in range(0,9):
             soma = soma+self.verificaConflitoColuna(estadoVerificacao, coluna)
-                
 
         for i in range(0,9):
             if i in [2,5,8]:
-                if self.verificaQuadrante(estadoVerificacao, i, i):
-                    soma = soma+1
+                soma=soma+self.verificaQuadrante(estadoVerificacao, i, i)
         
-        #print('soma massa '+str(soma))
         return soma
-
 
     def desenhaQuadrado(self, matrizDesenho):
         numeracao = ""
@@ -327,6 +282,3 @@ class GameAgente:
 
             print(' '+self.risco)
         print(numeracao)
-
-
-    #leArquivo()
