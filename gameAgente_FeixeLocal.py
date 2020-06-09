@@ -1,5 +1,5 @@
-class GameAgente:
-    def __init__(self, qtdReinicio):
+class GameAgenteFeixeLocal:
+    def __init__(self, k):
         self.cima = ''
         self.meio = ''
         self.risco = ''
@@ -16,7 +16,7 @@ class GameAgente:
         self.posicaoConflito = []
         self.bNaoPodeAlterar = False
         self.listaValoresIniciais = [[],[],[],[],[],[],[],[],[]]
-        self.qtdeReinicio = int(qtdReinicio)
+        self.k = int(k)
         self.leArquivo()
 
 
@@ -36,7 +36,9 @@ class GameAgente:
 
         self.addImutaveis(matriz)
         self.desenhaQuadrado(matriz)
-        self.subidaEncosta(tuple(matriz))
+        if not self.feixeLocal(tuple(matriz)):
+            print('Não encontrou solução :(!')
+
 
 
     def verificaArray(self, a):
@@ -57,69 +59,53 @@ class GameAgente:
                     self.listaNaoPodeMudar.append(str(linha)+str(coluna))
 
 
-    def subidaEncosta(self, matrizInicial):
+    def feixeLocal(self, matrizInicial):
+        import random
+        vizinhos = []
         auxCont = 0
-        verificacaoMelhorEstado = -1
-        bAux = False
-        #print('tamanho '+str(len(matrizInicial)))
-        #print('tamanho '+str(len(matrizResultado)))
-        while auxCont < self.qtdeReinicio:
+        aux1 = []
+        aux2 = []
+        menorAvaliacao = -1
+        melhorMatriz = []
+        while auxCont < self.k:
+            auxInicial = matrizInicial
             
-            melhorEstado = []
-            acoesRetornadas = []
-            matrizResultado = []
-            
-            auxFuncaoAvaliacao = 0
-            auxAcoesRetornadas = 0
-            #print('loco '+str(matrizResultado))
-            for i in range(len(matrizInicial)):
-                aux = []
-                for j in range(len(matrizInicial[i])):
-                    aux.append(matrizInicial[i][j])
-                    #print('aux '+str(aux))
-                matrizResultado.append(aux)
-            
-            
-            #print('massa '+str(matrizResultado))
+            for _ in range(9):                
+                for _ in range(9):
+                    for _ in range(9):
+                        aux1.append(str(random.randint(1,9)))
+                    aux2.append(aux1)
+                    aux1 = []
 
-            acoesRetornadas = self.acoes(matrizInicial)
-            
-            for linha in range(len(matrizResultado)):
-                for coluna in range(len(matrizResultado[linha])):
-                    if matrizResultado[linha][coluna] == ' ':
-                        #print('antes -> '+str(matrizResultado[linha][coluna]))
-                        matrizResultado[linha][coluna] = acoesRetornadas[auxAcoesRetornadas]
-                        #print('depois -> '+str(matrizResultado[linha][coluna]))
-                        auxAcoesRetornadas = auxAcoesRetornadas+1
-            auxFuncaoAvaliacao = self.funcaoAvaliacao(tuple(matrizResultado))
-            #print('matriz resultado '+str(matrizResultado))
-            #print('valor legal '+str(auxFuncaoAvaliacao))
-            #print('auzFunção '+str(auxFuncaoAvaliacao)+'   melhor estado '+str(verificacaoMelhorEstado))
-            if ((verificacaoMelhorEstado == -1) or (auxFuncaoAvaliacao < verificacaoMelhorEstado)):
-                verificacaoMelhorEstado = auxFuncaoAvaliacao
-                melhorEstado = matrizResultado
-                print('melhor '+str(verificacaoMelhorEstado))
                 
-            
-                if verificacaoMelhorEstado == 0:
-                    self.desenhaQuadrado(melhorEstado)
-                    print('Fim do jogo.')
-                    bAux = True
-                    break
-            
-                    #return melhorEstado
-            #matrizResultado.remove
-            auxCont = auxCont + 1
-        if not bAux:
-            print('Não foi encontrada a solução!')
+                vizinhos.append(self.resultado(aux2, auxInicial))
+                
+                aux2 = []
+            #print('vizinho '+str(vizinhos))
+            #daqui pra cima ta certo
+            for yy in range(9):
+                matrizAvaliar = []
+                for zz in range(9):
+                    matrizAvaliar.append(vizinhos[yy][zz])
 
+                if ( (menorAvaliacao == -1) or (menorAvaliacao > self.funcaoAvaliacao(matrizAvaliar))):
+                    menorAvaliacao = self.funcaoAvaliacao(matrizAvaliar)
+                    melhorMatriz = matrizAvaliar
+                    #print('menor '+str(menorAvaliacao))
+                    #print('melhor '+str(melhorMatriz))
+                if menorAvaliacao == 0:
+                    self.desenhaQuadrado(melhorMatriz)
+                    return True
+            #daqui pra baixo ta certo
+            #vizinhos = []
+            auxCont = auxCont+1
+        return False
 
 
     def verificaConflitoLinha(self, matrizVerifica):
         retorno = 0
         for i in range(len(matrizVerifica)):
             for j in range(i+1, len(matrizVerifica)):
-                #print('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz '+str(j))
                 if matrizVerifica[i] == matrizVerifica[j]:
                     retorno=retorno+1
 
@@ -213,15 +199,12 @@ class GameAgente:
 
         return estadoGerado
 
-    def resultado(self, linha, coluna, valor, matriz):
-        retorno = []
-        for i in range(matriz):
-            retorno.append(matriz[i])
-            for j in range(matriz[i]):
-                if i == linha and j == coluna:
-                    if not ((str(linha)+str(coluna)) in self.listaNaoPodeMudar):
-                        retorno[i][j] = valor
-        return retorno
+    def resultado(self, matrizFinal, matrizInicial):
+        for linha in range(9):
+            for coluna in range(9):
+                if ((str(linha)+str(coluna)) in self.listaNaoPodeMudar):
+                    matrizFinal[linha][coluna] = matrizInicial[linha][coluna]
+        return matrizFinal
 
 
 
