@@ -1,6 +1,7 @@
+#FOI IMPLEMENTADA SEGUINDO OS MÉTODOS CITADOS NO ENUNCIADO
 def backtracking(i, vetor):
+    
     if (i == 81):
-        imprime(vetor)
         return True
     elif (vetor[i] != 0):
         return backtracking(i+1, vetor)
@@ -8,14 +9,25 @@ def backtracking(i, vetor):
         if nao_ha_violacao(j, i, vetor):
             vetor[i] = j
             if backtracking(i+1, vetor):
-                imprime(vetor)
                 return True
             vetor[i] = 0
     return False
 
-
 def nao_ha_violacao(x, i, vetor):
     pass
 
-def imprime(vetor):
+def imprime(V):
     pass
+
+
+
+# DEMONSTRAÇÃO 
+
+y = []
+import random
+for z in range(0,81):
+    y.append(random.randint(1,9))
+if backtracking(0,y):
+    imprime(y)
+else:
+    print('Não foi possível encontrar a solução!')
