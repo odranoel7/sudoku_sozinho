@@ -1,4 +1,6 @@
 #FOI IMPLEMENTADA SEGUINDO OS MÉTODOS CITADOS NO ENUNCIADO
+
+
 def backtracking(i, vetor):
     
     if (i == 81):

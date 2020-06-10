@@ -22,7 +22,7 @@ class GameAgenteRetrocesso:
         matriz =[]
         local = input("Escreva o caminho do txt -->  ")
         arq = open(local)
-        
+        listaAux = []
         for line in arq.readlines():
             lista = []
             for i in range(len(line)):
@@ -32,32 +32,120 @@ class GameAgenteRetrocesso:
 
         self.addImutaveis(matriz)
         self.desenhaQuadrado(matriz)
-        if self.backtracking(0,0,matriz):
-            self.desenhaQuadrado(matriz)
-        else:
+        for i in range(len(matriz)):
+            for j in range(len(matriz[i])):
+                if matriz[i][j] != '\n':
+                    listaAux.append(matriz[i][j])
+        
+        #print(str(listaAux))
+        if not self.sudoku(0, listaAux):
             print('Não foi possível encontrar a solução! :(')
 
-    def backtracking(self, i, j,vetor):
-        import random
+        #if self.backtracking(0,0,matriz):
+        #    self.desenhaQuadrado(matriz)
+        #else:
+        #    print('Não foi possível encontrar a solução! :(')
+
+
+    def sudoku (self, i, V):
+        #print('cdefcedcf '+str(i))
         
-        if (i == 8) and (j == 8):
-            return True
-        
-        for linha in range(0,9):
-            for coluna in range(0,9):
-                valor = vetor[linha][coluna]
-                vetor[linha][coluna] = random.randint(1,9)
-                if not((not self.verificaConflitoLinha(vetor[linha])) 
-                   and (not self.verificaConflitoColuna(vetor, coluna))
-                   and (not self.verificaQuadrante(vetor, coluna, linha))
-                   and (str(linha)+str(coluna) not in self.listaNaoPodeMudar)):
-                    
-                    vetor[linha][coluna] = valor
-                else:
-                    if self.backtracking(i+1, j+1, vetor):
+        if i > 80:
+            self.desenhaQuadrado(self.listaMatriz(V))
+            #print(str(V))
+            return True # solução encontrada
+        elif V[i] != ' ': #Preenchida
+            return self.sudoku(i+1, V)
+
+        elif V[i] == ' ': # posição a preencher
+            for x in range(1,10):
+                if self.nao_ha_violacao(str(x),i,V): # registra e avança
+                    #print('-----')
+                    V[i] = str(x)
+                    if self.sudoku(i+1,V):
                         return True
-                        
-        return False
+                    V[i] = ' '
+                
+            return False
+
+    def listaMatriz(self, lista):
+        #print('cdfvc '+str(lista) )
+        matriz = []
+        matrizAux = []
+        aux = 0
+        for _ in range(9):
+            for j in range(9):
+                matrizAux.append(lista[aux+j])
+            aux=aux+9
+            matriz.append(matrizAux)
+            matrizAux = []
+        return matriz
+
+    def nao_ha_violacao(self, valor, i, lista):
+        matriz = []
+        #print('lista '+str(lista))
+        #print('vlr '+str(valor))
+        #print('i '+str(i))
+        #print()
+        #print('coluna -> '+str(coluna))
+        #print('linha -> '+str(linha))
+        #print('lista -> '+str(matriz))
+        #print()
+        
+        aux = lista[i]
+        lista[i] = valor
+        matriz = self.listaMatriz(lista)
+        #print('minha matriz '+str(matriz))
+
+        for linha in range(9):
+            for coluna in range(9):
+                #print('fdc '+str(matriz[linha]))
+
+                if not self.verificaConflitoLinha(matriz[linha]):
+                    if not self.verificaConflitoColuna(matriz, coluna):
+                        if self.verificaQuadrante(matriz, coluna, linha):
+                            matriz = []
+                            lista[i] = aux
+                            return False
+                    else:
+                        #print('2')
+                        matriz = []
+                        lista[i] = aux
+                        return False
+                else:
+                    #print('3')
+                    matriz = []
+                    lista[i] = aux
+                    return False
+
+        #print('yesssss')
+        return True
+
+
+    #FUNCIONA
+    #def backtracking(self, i, j,vetor):
+    #    import random
+    #    
+    #    if (i == 81) and (j == 81):
+    #        return True
+    #    
+    #    for linha in range(0,9):
+    #        for coluna in range(0,9):
+    #            valor = vetor[linha][coluna]
+    #            vetor[linha][coluna] = random.randint(1,9)
+    #            if not((not self.verificaConflitoLinha(vetor[linha])) 
+    #               and (not self.verificaConflitoColuna(vetor, coluna))
+    #               and (not self.verificaQuadrante(vetor, coluna, linha))
+    #               and (str(linha)+str(coluna) not in self.listaNaoPodeMudar)):
+    #                
+    #                vetor[linha][coluna] = valor
+    #                
+    #            else:
+    #                if self.backtracking(i+1, j+1, vetor):
+    #                    return True
+    #    
+    #                    
+    #    return False
 
 
     def verificaArray(self, a):
@@ -80,15 +168,14 @@ class GameAgenteRetrocesso:
     def verificaConflitoLinha(self, matrizVerifica):
         for i in range(len(matrizVerifica)):
             for j in range(i+1, len(matrizVerifica)):
-                if matrizVerifica[i] == matrizVerifica[j]:
+                if ((matrizVerifica[i] == matrizVerifica[j]) and (matrizVerifica[i] != ' ' and matrizVerifica[j] != ' ')):
                     return True
-
         return False
 
     def verificaConflitoColuna(self, matrizVerifica, coluna):
         for i in range(0,9):
             for j in range(i+1, 9):
-                if matrizVerifica[i][int(coluna)] == matrizVerifica[j][int(coluna)]:
+                if ((matrizVerifica[i][int(coluna)] == matrizVerifica[j][int(coluna)]) and (matrizVerifica[i][int(coluna)] != ' ' and matrizVerifica[j][int(coluna)] != ' ')):
                     #TEM CONFLITO NA COLUNA
                     return True
         return False
@@ -130,8 +217,8 @@ class GameAgenteRetrocesso:
             i = i + 1
 
         for i in range(0, len(quadrante)):
-            for j in range(0, len(quadrante)):
-                if quadrante[i] == quadrante[j]:
+            for j in range(i+1, len(quadrante)):
+                if ((quadrante[i] == quadrante[j]) and (quadrante[i] != ' ' and quadrante[j] != ' ')):
                     conflitoQuad = True
                     auxiliar = i
                     break
@@ -197,12 +284,10 @@ class GameAgenteRetrocesso:
                 elif i == 25:
                     if (str(conta)+str(8)) in self.posicaoConflito:
                         self.meio = self.meio + \
-                            '\033[31m'+matrizDesenho[conta][8] + \
-                            '\033[0;0m'+' '+chr(9475)
+                            matrizDesenho[conta][8] +' '+chr(9475)
                     elif (str(conta)+str(8)) in self.listaNaoPodeMudar:
                         self.meio = self.meio + \
-                            '\033[32m'+matrizDesenho[conta][8] + \
-                            '\033[0;0m'+' '+chr(9475)
+                            matrizDesenho[conta][8]+' '+chr(9475)
                     else:
                         self.meio = self.meio + matrizDesenho[conta][8]+' '+chr(9475)
 
@@ -210,12 +295,9 @@ class GameAgenteRetrocesso:
                     if passou == 0:
                         if (str(conta)+str(auxColuna)) in self.posicaoConflito:
                             self.meio = self.meio + \
-                                '\033[31m'+matrizDesenho[conta][auxColuna] + \
-                                '\033[0;0m'
+                                matrizDesenho[conta][auxColuna]
                         elif (str(conta)+str(auxColuna)) in self.listaNaoPodeMudar:
-                            self.meio = self.meio + \
-                                '\033[32m'+matrizDesenho[conta][auxColuna] + \
-                                '\033[0;0m'
+                            self.meio = self.meio+matrizDesenho[conta][auxColuna]
                         else:
                             self.meio = self.meio + matrizDesenho[conta][auxColuna]
 
