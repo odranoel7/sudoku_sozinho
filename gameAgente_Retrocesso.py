@@ -36,40 +36,27 @@ class GameAgenteRetrocesso:
             for j in range(len(matriz[i])):
                 if matriz[i][j] != '\n':
                     listaAux.append(matriz[i][j])
-        
-        #print(str(listaAux))
-        if not self.sudoku(0, listaAux):
+        if not self.backtracking(0, listaAux):
             print('Não foi possível encontrar a solução! :(')
-
-        #if self.backtracking(0,0,matriz):
-        #    self.desenhaQuadrado(matriz)
-        #else:
-        #    print('Não foi possível encontrar a solução! :(')
-
-
-    def sudoku (self, i, V):
-        #print('cdefcedcf '+str(i))
         
+    def backtracking (self, i, V):
         if i > 80:
             self.desenhaQuadrado(self.listaMatriz(V))
-            #print(str(V))
-            return True # solução encontrada
-        elif V[i] != ' ': #Preenchida
-            return self.sudoku(i+1, V)
+            return True 
+        elif V[i] != ' ':
+            return self.backtracking(i+1, V)
 
-        elif V[i] == ' ': # posição a preencher
+        elif V[i] == ' ':
             for x in range(1,10):
-                if self.nao_ha_violacao(str(x),i,V): # registra e avança
-                    #print('-----')
+                if self.nao_ha_violacao(str(x),i,V):
                     V[i] = str(x)
-                    if self.sudoku(i+1,V):
+                    if self.backtracking(i+1,V):
                         return True
                     V[i] = ' '
-                
             return False
 
     def listaMatriz(self, lista):
-        #print('cdfvc '+str(lista) )
+        
         matriz = []
         matrizAux = []
         aux = 0
@@ -83,24 +70,12 @@ class GameAgenteRetrocesso:
 
     def nao_ha_violacao(self, valor, i, lista):
         matriz = []
-        #print('lista '+str(lista))
-        #print('vlr '+str(valor))
-        #print('i '+str(i))
-        #print()
-        #print('coluna -> '+str(coluna))
-        #print('linha -> '+str(linha))
-        #print('lista -> '+str(matriz))
-        #print()
-        
         aux = lista[i]
         lista[i] = valor
         matriz = self.listaMatriz(lista)
-        #print('minha matriz '+str(matriz))
-
+        
         for linha in range(9):
             for coluna in range(9):
-                #print('fdc '+str(matriz[linha]))
-
                 if not self.verificaConflitoLinha(matriz[linha]):
                     if not self.verificaConflitoColuna(matriz, coluna):
                         if self.verificaQuadrante(matriz, coluna, linha):
@@ -108,45 +83,14 @@ class GameAgenteRetrocesso:
                             lista[i] = aux
                             return False
                     else:
-                        #print('2')
                         matriz = []
                         lista[i] = aux
                         return False
                 else:
-                    #print('3')
                     matriz = []
                     lista[i] = aux
                     return False
-
-        #print('yesssss')
         return True
-
-
-    #FUNCIONA
-    #def backtracking(self, i, j,vetor):
-    #    import random
-    #    
-    #    if (i == 81) and (j == 81):
-    #        return True
-    #    
-    #    for linha in range(0,9):
-    #        for coluna in range(0,9):
-    #            valor = vetor[linha][coluna]
-    #            vetor[linha][coluna] = random.randint(1,9)
-    #            if not((not self.verificaConflitoLinha(vetor[linha])) 
-    #               and (not self.verificaConflitoColuna(vetor, coluna))
-    #               and (not self.verificaQuadrante(vetor, coluna, linha))
-    #               and (str(linha)+str(coluna) not in self.listaNaoPodeMudar)):
-    #                
-    #                vetor[linha][coluna] = valor
-    #                
-    #            else:
-    #                if self.backtracking(i+1, j+1, vetor):
-    #                    return True
-    #    
-    #                    
-    #    return False
-
 
     def verificaArray(self, a):
         if a in self.posicaoConflito:
@@ -322,6 +266,3 @@ class GameAgenteRetrocesso:
 
             print(' '+self.risco)
         print(numeracao)
-
-
-    #leArquivo()

@@ -163,10 +163,6 @@ class GameHumano:
                     self.bConflito = False 
 
     def verificaQuadrante(self, acao=None):
-        
-        
-        global conflitoQuad    
-        global posicaoConflito
         colunaAux=0
         linhaAux=0
         posicaoColorirQuadAux = []
@@ -291,6 +287,3 @@ class GameHumano:
                                 
             print(' '+self.risco)
         print(numeracao)
-        
-
-    #leArquivoHumano()
